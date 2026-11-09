@@ -2,6 +2,12 @@
 load_supabase.py
 Loads all Fantrax batch SQL files into Supabase.
 Run from Spyder: %runfile C:/Users/James/load_supabase.py --wdir
+Required GitHub Secret:
+    SUPABASE_PASSWORD   — Supabase database password
+
+Run locally (PowerShell):
+    $env:SUPABASE_PASSWORD = "yourpassword"
+    python load_supabase_actions.py
 """
 
 import os
@@ -10,9 +16,9 @@ from sqlalchemy import create_engine, text
 from urllib.parse import quote_plus
 
 # ── Connection ──────────────────────────────────────────────────────────────
-sb_password = quote_plus("Blurbinsupabase7&")
+## SUPABASE_PASSWORD = quote_plus("REMOVED")
 engine = create_engine(
-    f"postgresql+psycopg2://postgres.rlwidfirrdwolaywjpca:{sb_password}"
+    f"postgresql+psycopg2://postgres.rlwidfirrdwolaywjpca:{SUPABASE_PASSWORD}"
     f"@aws-1-us-east-2.pooler.supabase.com:5432/postgres",
     connect_args={"sslmode": "require", "gssencmode": "disable"}
 )
