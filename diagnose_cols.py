@@ -1,6 +1,12 @@
 """
 diagnose_cols.py
 Compares column names between local PostgreSQL and Supabase for the Hitters table.
+Required GitHub Secret:
+    POSTGRES_PASSWORD   — Supabase database password
+
+Run locally (PowerShell):
+    $env:POSTGRES_PASSWORD = "yourpassword"
+    python diagnose_cols.py
 """
 import psycopg2
 from sqlalchemy import create_engine, text
