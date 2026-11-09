@@ -11,6 +11,20 @@ Tables handled:
 
 Run from Anaconda Prompt (avoids Spyder .pyc caching):
   python "C:/Users/James/OneDrive/Documents/Claude/Projects/Fantasy Baseball (1)/direct_transfer.py"
+  
+  Required GitHub Secret:
+    SUPABASE_PASSWORD   — Supabase database password
+
+Run locally (PowerShell):
+    $env:SUPABASE_PASSWORD = "yourpassword"
+    python direct_transfer.py
+
+    Required GitHub Secret:
+    POSTGRES_PASSWORD   — Supabase database password
+
+Run locally (PowerShell):
+    $env:POSTGRES_PASSWORD = "yourpassword"
+    python direct_transfer.py
 """
 
 import datetime
@@ -25,13 +39,13 @@ local_engine = create_engine(
     "postgresql+psycopg2://postgres:yHq5gcTHDkNKbFXJ@localhost:5432/fantrax"
 )
 
-sb_password = quote_plus("yHq5gcTHDkNKbFXJ")
+sb_password = SUPABASE_PASSWORD
 sb_conn = psycopg2.connect(
     host="aws-1-us-east-2.pooler.supabase.com",
     port=5432,
     dbname="postgres",
     user="postgres.rlwidfirrdwolaywjpca",
-    password="Blurbinsupabase7&",
+    password=POSTGRES_PASSWORD,
     sslmode="require",
     gssencmode="disable"
 )
