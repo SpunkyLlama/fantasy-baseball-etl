@@ -21,7 +21,7 @@ sb_conn = psycopg2.connect(
     port=5432,
     dbname="postgres",
     user="postgres.rlwidfirrdwolaywjpca",
-    password="Blurbinsupabase7&",
+    password=POSTGRES_PASSWORD,
     sslmode="require",
     gssencmode="disable"
 )
