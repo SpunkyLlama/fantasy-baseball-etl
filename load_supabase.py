@@ -7,7 +7,7 @@ Required GitHub Secret:
 
 Run locally (PowerShell):
     $env:SUPABASE_PASSWORD = "yourpassword"
-    python load_supabase_actions.py
+    python load_supabase.py
 """
 
 import os
