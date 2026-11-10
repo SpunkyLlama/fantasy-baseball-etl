@@ -3,7 +3,7 @@ verify_counts.py
 Compares row counts between local PostgreSQL and Supabase.
 """
 
-import OS
+import os
 from sqlalchemy import create_engine, text
 from urllib.parse import quote_plus
 
