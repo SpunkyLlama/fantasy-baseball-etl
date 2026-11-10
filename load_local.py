@@ -12,20 +12,24 @@ What it does:
   4. Prints final row counts for all 6 tables
 """
 
+import OS
 import glob
 import os
 import re
 import psycopg2
 
-# ── Local PostgreSQL connection ───────────────────────────────────────────────
-conn = psycopg2.connect(
-    host="localhost",
-    port=5432,
-    dbname="fantrax",
-    user="postgres",
-    password="Blurbinpostgres7&"
+local_pw = os.environ["LOCAL_PG_PASSWORD"]
+sb_password = os.environ["SUPABASE_PASSWORD"]
+
+local_engine = create_engine(
+    f"postgresql+psycopg2://postgres:{quote_plus(local_pw)}@localhost:5432/fantrax"
 )
-cur = conn.cursor()
+
+supabase_engine = create_engine(
+    f"postgresql+psycopg2://postgres.rlwidfirrdwolaywjpca:{quote_plus(sb_password)}"
+    f"@aws-1-us-east-2.pooler.supabase.com:5432/postgres",
+    connect_args={"sslmode": "require", "gssencmode": "disable"}
+)
 
 # ── Config ────────────────────────────────────────────────────────────────────
 BATCH_DIR = r"C:\Users\James\OneDrive\Documents\Claude\Projects\Fantasy Baseball (1)\batches"
