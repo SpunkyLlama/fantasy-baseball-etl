@@ -3,18 +3,22 @@ verify_counts.py
 Compares row counts between local PostgreSQL and Supabase.
 """
 
+import OS
 from sqlalchemy import create_engine, text
 from urllib.parse import quote_plus
 
 # ── Local PostgreSQL ─────────────────────────────────────────────────────────
-local_engine = create_engine(
-    "postgresql+psycopg2://postgres:Blurbinpostgres7&@localhost:5432/fantrax"
-)
+local_pw = os.environ["LOCAL_PG_PASSWORD"]
 
 # ── Supabase ─────────────────────────────────────────────────────────────────
-sb_password = quote_plus("yHq5gcTHDkNKbFXJ")
+sb_password = os.environ["SUPABASE_PASSWORD"]
+
+local_engine = create_engine(
+    f"postgresql+psycopg2://postgres:{quote_plus(local_pw)}@localhost:5432/fantrax"
+)
+
 supabase_engine = create_engine(
-    f"postgresql+psycopg2://postgres.rlwidfirrdwolaywjpca:{sb_password}"
+    f"postgresql+psycopg2://postgres.rlwidfirrdwolaywjpca:{quote_plus(sb_password)}"
     f"@aws-1-us-east-2.pooler.supabase.com:5432/postgres",
     connect_args={"sslmode": "require", "gssencmode": "disable"}
 )
