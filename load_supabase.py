@@ -17,8 +17,9 @@ from urllib.parse import quote_plus
 
 # ── Connection ──────────────────────────────────────────────────────────────
 ## SUPABASE_PASSWORD = quote_plus("REMOVED")
+SUPABASE_PASSWORD = os.environ["SUPABASE_PASSWORD"]
 engine = create_engine(
-    f"postgresql+psycopg2://postgres.rlwidfirrdwolaywjpca:{SUPABASE_PASSWORD}"
+    f"postgresql+psycopg2://postgres.rlwidfirrdwolaywjpca:{quote_plus(SUPABASE_PASSWORD)}"
     f"@aws-1-us-east-2.pooler.supabase.com:5432/postgres",
     connect_args={"sslmode": "require", "gssencmode": "disable"}
 )
