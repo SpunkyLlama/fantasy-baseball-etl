@@ -2,57 +2,41 @@
 direct_transfer.py
 Transfers all Fantrax tables from local PostgreSQL to Supabase.
 
-Tables handled:
-  - Fantrax_Transaction_History  (with cap hit calculation)
-  - Fantrax_Players_Hitters_Rawlings
-  - Fantrax_Players_Hitters_Topps
-  - Fantrax_Players_Pitchers_Rawlings
-  - Fantrax_Players_Pitchers_Topps
+(keep your "Tables handled" list here)
 
-Run from Anaconda Prompt (avoids Spyder .pyc caching):
-  python "C:/Users/James/OneDrive/Documents/Claude/Projects/Fantasy Baseball (1)/direct_transfer.py"
-  
-  Required GitHub Secret:
-    SUPABASE_PASSWORD   — Supabase database password
-
-Run locally (PowerShell):
-    $env:SUPABASE_PASSWORD = "yourpassword"
-    python direct_transfer.py
-
-    Required GitHub Secret:
-    POSTGRES_PASSWORD   — Supabase database password
-
-Run locally (PowerShell):
-    $env:POSTGRES_PASSWORD = "yourpassword"
-    python direct_transfer.py
+Required environment variables:
+    LOCAL_PG_PASSWORD   - local PostgreSQL password
+    SUPABASE_PASSWORD   - Supabase database password
 """
 
+import os
 import datetime
 import psycopg2
 from psycopg2.extras import execute_values
 from sqlalchemy import create_engine, text
 from urllib.parse import quote_plus
 
-# ── Connections ──────────────────────────────────────────────────────────────
+# ── Connections ──
+LOCAL_PG_PASSWORD = os.environ["LOCAL_PG_PASSWORD"]
+SUPABASE_PASSWORD = os.environ["SUPABASE_PASSWORD"]
 
 local_engine = create_engine(
-    "postgresql+psycopg2://postgres:yHq5gcTHDkNKbFXJ@localhost:5432/fantrax"
+    f"postgresql+psycopg2://postgres:{quote_plus(LOCAL_PG_PASSWORD)}@localhost:5432/fantrax"
 )
 
-sb_password = SUPABASE_PASSWORD
 sb_conn = psycopg2.connect(
     host="aws-1-us-east-2.pooler.supabase.com",
     port=5432,
     dbname="postgres",
     user="postgres.rlwidfirrdwolaywjpca",
-    password=POSTGRES_PASSWORD,
+    password=SUPABASE_PASSWORD,
     sslmode="require",
     gssencmode="disable"
 )
 sb_cur = sb_conn.cursor()
 
 sb_engine = create_engine(
-    f"postgresql+psycopg2://postgres.rlwidfirrdwolaywjpca:{sb_password}"
+    f"postgresql+psycopg2://postgres.rlwidfirrdwolaywjpca:{quote_plus(SUPABASE_PASSWORD)}"
     f"@aws-1-us-east-2.pooler.supabase.com:5432/postgres",
     connect_args={"sslmode": "require", "gssencmode": "disable"}
 )
