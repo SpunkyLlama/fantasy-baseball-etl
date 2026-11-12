@@ -4,7 +4,7 @@
 # Also available as a manual trigger any time via the GitHub Actions UI.
 #
 # Required secret:
-#   SUPABASE_ANON_KEY  — Supabase anon key (Settings → API in Supabase dashboard)
+#   SUPABASE_SERVICE_KEY  — Supabase service key (Settings → API in Supabase dashboard)
 #                        Add at: repo → Settings → Secrets and variables → Actions → New repository secret
 #
 # To run manually:
@@ -61,7 +61,7 @@ jobs:
       # ── 5. Upload to Supabase ──────────────────────────────────────────────
       - name: Upload to Supabase
         env:
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           SAVANT_YEAR:       ${{ github.event.inputs.year }}
         run: python load_savant_to_supabase.py
 
