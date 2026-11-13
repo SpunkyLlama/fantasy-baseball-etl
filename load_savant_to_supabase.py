@@ -29,7 +29,7 @@ SUPABASE_URL = os.environ.get(
     "SUPABASE_URL",
     "https://rlwidfirrdwolaywjpca.supabase.co"
 )
-SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_ANON_KEY")
+SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
 
 if not SERVICE_KEY:
     sys.exit(
