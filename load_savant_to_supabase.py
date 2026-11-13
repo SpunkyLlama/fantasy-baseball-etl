@@ -6,15 +6,13 @@ public.savant_metrics on Supabase via the REST API.
 
 Required env vars:
     SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-    SUPABASE_ANON_KEY   — anon key from Supabase Settings → API
-                          (also accepts SUPABASE_SERVICE_KEY for service role)
 
 Optional env vars:
     SUPABASE_URL        — override project URL (default: HoD project)
     SAVANT_YEAR         — year suffix for input CSV (default: current year)
 
 Usage:
-    SUPABASE_ANON_KEY=eyJ... python load_savant_to_supabase.py
+    SUPABASE_SERVICE_KEY=eyJ... python load_savant_to_supabase.py
 """
 
 import os
