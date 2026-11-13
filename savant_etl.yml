@@ -13,6 +13,8 @@
 name: Savant ETL
 
 on:
+permissions:
+  contents: read
   schedule:
     # 11:00 UTC = 7:00 AM ET (EST) / 7:00 AM ET (EDT offset by 1hr — close enough)
     # Runs daily April through October (MLB season).
@@ -29,6 +31,8 @@ on:
         default: ''
 
 jobs:
+permissions:
+  contents: read
   etl:
     name: Extract → Upload
     runs-on: ubuntu-latest
