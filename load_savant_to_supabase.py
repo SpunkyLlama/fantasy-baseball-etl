@@ -5,6 +5,7 @@ Reads the CSV produced by savant_extract.py and upserts rows into
 public.savant_metrics on Supabase via the REST API.
 
 Required env vars:
+    SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
     SUPABASE_ANON_KEY   — anon key from Supabase Settings → API
                           (also accepts SUPABASE_SERVICE_KEY for service role)
 
@@ -30,13 +31,13 @@ SUPABASE_URL = os.environ.get(
     "SUPABASE_URL",
     "https://rlwidfirrdwolaywjpca.supabase.co"
 )
-ANON_KEY = os.environ.get("SUPABASE_ANON_KEY") or os.environ.get("SUPABASE_SERVICE_KEY")
+ANON_KEY = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_ANON_KEY")
 
-if not ANON_KEY:
+if not SERVICE_KEY:
     sys.exit(
-        "ERROR: Set SUPABASE_ANON_KEY env var.\n"
-        "  Local:   set SUPABASE_ANON_KEY=eyJ... (Windows) or export SUPABASE_ANON_KEY=eyJ... (bash)\n"
-        "  Actions: add SUPABASE_ANON_KEY to repo Secrets"
+        "ERROR: Set SUPABASE_SERVICE_KEY var.\n"
+        "  Local:   set SUPABASE_SERVICE_KEY=eyJ... (Windows) or export SUPABASE_SERVICE_KEY=eyJ... (bash)\n"
+        "  Actions: add SUPABASE_SERVICE_KEY to repo Secrets"
     )
 
 YEAR     = int(os.environ.get("SAVANT_YEAR") or datetime.now().year)
@@ -45,8 +46,8 @@ ENDPOINT = f"{SUPABASE_URL}/rest/v1/savant_metrics"
 CHUNK    = 50
 
 HEADERS = {
-    "apikey":        ANON_KEY,
-    "Authorization": f"Bearer {ANON_KEY}",
+    "apikey":       SERVICE_KEY,
+    "Authorization": f"Bearer {SERVICE_KEY}",
     "Content-Type":  "application/json",
     "Prefer":        "resolution=merge-duplicates",  # upsert
 }
