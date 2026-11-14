@@ -75,10 +75,12 @@ pit_exp  = safe_pull(statcast_pitcher_expected_stats, YEAR)
 
 # ── Normalize player name columns ─────────────────────────────────────────────
 # pybaseball returns names in different formats depending on the endpoint:
-#   statcast_batter_percentile_ranks → player_name = "Last, First"
-#   statcast_batter_expected_stats   → last_name + first_name columns
-#   statcast_sprint_speed            → last_name + first_name columns
-#   statcast_batter_exitvelo_barrels → last_name + first_name columns
+#   statcast_*_percentile_ranks      → player_name = "Last, First"
+#   statcast_*_expected_stats,
+#   statcast_sprint_speed,
+#   statcast_batter_exitvelo_barrels → ONE column literally named
+#                                      "last_name, first_name" ("Last, First");
+#                                      older pybaseball: last_name + first_name
 # All must resolve to "First Last" to match existing savant_metrics rows.
 
 def flip_last_first(name: str) -> str:
@@ -92,6 +94,9 @@ def normalize_name(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     if "player_name" in df.columns:
         df["player_name"] = df["player_name"].apply(flip_last_first)
+    elif "last_name, first_name" in df.columns:
+        # one column whose NAME contains the comma; its values are "Last, First"
+        df["player_name"] = df["last_name, first_name"].apply(flip_last_first)
     elif "last_name" in df.columns and "first_name" in df.columns:
         df["player_name"] = df["first_name"].str.strip() + " " + df["last_name"].str.strip()
     elif "name" in df.columns:
