@@ -264,3 +264,18 @@ combined.to_csv(OUT_FILE, index=False)
 print(f"\nWrote {len(combined)} rows → {OUT_FILE}")
 print(f"Columns: {list(combined.columns)}")
 print(f"Batters: {len(batters.dropna(subset=['player_name']))} | Pitchers: {len(pitchers.dropna(subset=['player_name']))}")
+
+# ── Non-null coverage ─────────────────────────────────────────────────────────
+# Row counts alone can't show whether a column actually has values (Savant leaves
+# some percentiles blank, e.g. for unqualified players). This logs, per player
+# type, how many rows have a value in each column, so a run's log shows what the
+# CSV (and therefore the upload) really contains.
+print("\nNon-null counts per column (rows with a value / total rows):")
+if combined.empty:
+    print("  (no rows)")
+for ptype, grp in combined.groupby("player_type"):
+    print(f"  {ptype} ({len(grp)} rows)")
+    for col in combined.columns:
+        if col in ("player_name", "player_type"):
+            continue
+        print(f"    {col:<34} {grp[col].notna().sum():>5} / {len(grp)}")
