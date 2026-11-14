@@ -19,6 +19,8 @@ Last updated: 2026-11-14
 - Decide whether `season` should be uploaded: the loader's `COL_MAP` omits it
   (see `CLAUDE.md`, Known mess).
 - Test gaps: Selenium scraper, Supabase load step, standings parser, date helpers.
-- Review Fantrax `robots.txt` and terms.
+- Read Fantrax's Terms of Service (browser; the page is JS-rendered). `robots.txt`
+  is done: generic rule allows, named AI crawlers are disallowed (details in
+  `CLAUDE.md`). Also review the official Fantrax API on the `/developer` page.
 - Decide: keep `batches/` tracked? Remove stray `git` file?
 - Decide whether to turn off Pages on this repo.
