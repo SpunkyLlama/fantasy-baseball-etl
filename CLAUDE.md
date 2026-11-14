@@ -110,7 +110,12 @@ find out which one is wrong before touching either.
 - An empty file named `git` sits in the repo root (stray shell redirect).
 - Stale remote branches still to delete: `master` (orphan),
   `fix/savant-service-key`, `fix/savant-combined-name-column`,
-  `fix/savant-percentile-aliases`, `docs/claude-md`, `test/offline-suite`.
-- `load_savant_to_supabase.py`'s `COL_MAP` has no entry for `season`, so the
-  season is not uploaded. Tests pin this. Check whether the DB column has a
-  default before changing it.
+  `fix/savant-percentile-aliases`, `docs/claude-md`, `test/offline-suite`,
+  `docs/update-ci-notes`, `docs/fantrax-robots`.
+- `public.savant_metrics` has **no `season` column** (checked 2026-11-14), so the
+  loader leaving `season` out of `COL_MAP` is correct, not a bug. Tests pin the
+  16 uploaded columns. Consequences: the table cannot tell seasons apart, an
+  upsert never deletes, so players absent from a later pull keep their old
+  values, and `updated_at` is set on insert only (it is not refreshed by an
+  upsert), so it is not a freshness signal. Keeping per-season history would
+  need a schema change.
