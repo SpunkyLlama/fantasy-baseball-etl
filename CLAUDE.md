@@ -68,16 +68,39 @@ paths. Don't "fix" them as a side effect of other work.
 
 ## Testing / "Green"
 
-"Green" means CI passes. Right now there is **no PR-triggered CI and no test
-suite** — both workflows are scheduled/manual loaders. The first Green needs
-two things: a small test suite (start with column-mapping and name-parsing in
-`savant_extract.py` / `csv_to_batches.py`, which can run offline against a
-stub CSV) and a workflow that runs it on every PR.
+"Green" means CI passes. `.github/workflows/tests.yml` runs `pytest` on every PR
+and on pushes to `main` (Python 3.11, no network, no secrets). A PR should be
+green before it is merged.
+
+Run locally:
+
+```bash
+pip install -r requirements-dev.txt
+pytest -q
+```
+
+What the suite covers (`tests/`):
+- `test_savant_pipeline.py` — runs `savant_extract.py` and
+  `load_savant_to_supabase.py` end to end. Both are import-time scripts, so
+  `conftest.py` runs them with `runpy`, a fake `pybaseball` in `sys.modules`,
+  and a recorded `requests.post`. Pins the 18 extract columns and the 16 columns
+  sent to Supabase.
+- `test_fantrax_batches.py` — `sql_val`, league detection, and the round trip
+  between `csv_to_batches.py` (writer) and `load_supabase_actions.py` (parser).
+
+Not covered: the Selenium scraper, the Supabase `TRUNCATE`/`INSERT` step, the
+Fantrax standings parser, and the date helpers. When you change a column map
+or alias, update the tests in the same PR. If a test and the loader disagree,
+find out which one is wrong before touching either.
 
 ## Known mess
 
 - `batches/*.sql` is generated output but tracked in git. Decide whether it
   stays tracked (needed for `skip_scrape`) or moves to artifacts.
 - An empty file named `git` sits in the repo root (stray shell redirect).
-- Stale remote branches still to delete: `fix/savant-service-key`,
-  `fix/savant-combined-name-column`, `fix/savant-percentile-aliases`.
+- Stale remote branches still to delete: `master` (orphan),
+  `fix/savant-service-key`, `fix/savant-combined-name-column`,
+  `fix/savant-percentile-aliases`, `docs/claude-md`, `test/offline-suite`.
+- `load_savant_to_supabase.py`'s `COL_MAP` has no entry for `season`, so the
+  season is not uploaded. Tests pin this. Check whether the DB column has a
+  default before changing it.
