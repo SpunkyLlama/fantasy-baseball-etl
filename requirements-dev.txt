@@ -1,0 +1,5 @@
+# Everything the offline test suite needs. No network, no credentials.
+-r requirements.txt
+pytest
+pandas
+requests
