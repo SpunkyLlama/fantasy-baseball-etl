@@ -122,6 +122,48 @@ def test_rows_without_a_player_name_are_dropped(run_extract, savant_frames):
     assert (df.player_name.str.strip() != "").all()
 
 
+def _nonnull_counts(out: str, ptype: str) -> dict:
+    """Parse the log's non-null block for one player type into {column: (n, total)}."""
+    import re
+    block = out.split("Non-null counts per column", 1)[1]
+    start = re.search(rf"^  {ptype} \((\d+) rows\)$", block, re.M)
+    assert start, f"no non-null block for {ptype}"
+    counts = {}
+    for line in block[start.end():].splitlines()[1:]:
+        m = re.match(r"^    (\S+)\s+(\d+) / (\d+)$", line)
+        if not m:
+            break
+        counts[m.group(1)] = (int(m.group(2)), int(m.group(3)))
+    return counts
+
+
+def test_log_reports_non_null_counts_per_player_type(run_extract, savant_frames, capsys):
+    run_extract(savant_frames)
+    out = capsys.readouterr().out
+    hitters = _nonnull_counts(out, "H")
+    pitchers = _nonnull_counts(out, "P")
+    assert hitters["savant_exit_velocity"] == (2, 2)
+    assert hitters["savant_sprint_speed"] == (2, 2)
+    assert hitters["savant_xera"] == (0, 2)       # pitcher-only column is empty for hitters
+    assert pitchers["savant_xera"] == (1, 1)
+    assert pitchers["savant_sprint_speed"] == (0, 1)
+    assert "player_name" not in hitters and "player_type" not in hitters
+
+
+def test_log_counts_a_partly_blank_percentile_as_not_non_null(run_extract, savant_frames, capsys):
+    # A player Savant returns with a blank EV percentile must not be counted.
+    f = savant_frames["statcast_batter_percentile_ranks"].copy()
+    f.loc[f.player_name == "Soto, Juan", "exit_velocity"] = None
+    savant_frames["statcast_batter_percentile_ranks"] = f
+    run_extract(savant_frames)
+    assert _nonnull_counts(capsys.readouterr().out, "H")["savant_exit_velocity"] == (1, 2)
+
+
+def test_off_season_logs_no_rows_instead_of_crashing(run_extract, capsys):
+    run_extract({})
+    assert "(no rows)" in capsys.readouterr().out
+
+
 def test_off_season_with_no_data_does_not_crash(run_extract):
     # savant_etl.yml runs daily all year; the script is supposed to exit cleanly
     # when Savant has nothing yet.
