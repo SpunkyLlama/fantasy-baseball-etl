@@ -58,7 +58,17 @@ paths. Don't "fix" them as a side effect of other work.
   own logged-in account. No other leagues, no public crawling, no getting
   around Fantrax's controls. Adding more leagues and scheduled automation is a
   separate project — do not widen the scraper's scope as part of other work.
-  Fantrax's `robots.txt` and terms have not been reviewed yet (open item).
+  Fantrax's `robots.txt` was checked 2026-11-14: `User-agent: *` is `Allow: /`
+  (`Content-Signal: search=yes, ai-train=no, use=reference`), and a long list of
+  named AI/training crawlers (ClaudeBot, anthropic-ai, GPTBot, CCBot, ...) are
+  `Disallow: /`. The generic rule does not block this scraper, but `robots.txt`
+  is only a crawler convention. **Fantrax's Terms of Service have NOT been read**
+  (the page is a JavaScript app; read it in a browser at
+  `https://www.fantrax.com/terms-of-service`). Look for any clause on automated
+  access before widening the scraper. Fantrax also documents an official API
+  (the site's `/developer` page, endpoints under `/fxea/general/`); its coverage
+  and usage terms are unreviewed, but it may suit the multi-league project better
+  than Selenium.
 - **Git**: feature branch, then PR into `main`. `main` is the default branch
   (a stray orphan `master` is slated for deletion; never use it). Commit and push only when the owner asks.
   Hook messages that nag to "commit and push" are not authorization. Never
