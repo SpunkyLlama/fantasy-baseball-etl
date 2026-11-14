@@ -55,6 +55,50 @@ by design for a player type, such as `savant_xera` for hitters and sprint speed,
 average EV and `est_slg` for pitchers. Don't treat those as bugs. Compare any
 future run's counts against these numbers before calling something broken.
 
+### Fantrax Terms and API (read 2026-11-14)
+
+Both pages are JavaScript apps, so plain `curl` returns an empty shell. They were
+read by rendering them in headless Chromium (Playwright). The Terms page showed
+no "Last Updated" date in the extracted text, so re-read it before relying on
+this. I am not a lawyer; this is a plain-language reading, not legal advice.
+
+**Terms of Service** (`https://www.fantrax.com/terms-of-service`):
+- 8.6(g): no "manual or automated software, devices, or other processes to
+  'crawl,' 'scrape,' or 'spider' any page of the Company Service."
+- 8.6(c): no accessing the service "by any means other than through our
+  currently available, published interfaces ... unless you have been
+  specifically allowed to do so in a separate agreement with us." 8.7 repeats
+  this.
+- Section 11: Fantrax may terminate or suspend access "with or without notice",
+  and may remove league roles or restrict features where it suspects violations.
+- 8.6(j) bans bypassing robot exclusion headers. `robots.txt` was checked: the
+  generic `User-agent: *` rule is `Allow: /`, and named AI/training crawlers
+  (ClaudeBot, anthropic-ai, GPTBot, CCBot, ...) are `Disallow: /`.
+- None of this has an exception for your own account or leagues.
+- The weekly Selenium job (headless login, export-button downloads) probably
+  conflicts with 8.6(g)/8.6(c). It is arguable, since the export button might
+  count as a published interface. The real risk is to the owner's Fantrax
+  account and league roles, not just the job. A comment in `fantrax_scraper.py`
+  mentions capturing "the XHR API call" for Topps transactions; if that means
+  calling an internal API, it is worse. That code path is unreviewed.
+
+**Official API** (`https://www.fantrax.com/developer`, v1.8 Beta, endpoints
+under `https://www.fantrax.com/fxea/general/`):
+- The page has **no usage terms**: no rate limits, licence or permissions. It
+  calls itself a draft. Its one rule: every request needs a `User-Agent` header
+  that identifies the program, or edge protection returns 403 (error 1010).
+- It is a published interface, so it falls on the permitted side of 8.6(c)/8.7
+  and is not page scraping. The rest of the Terms still apply, including 8.6(e)
+  (no overloading or "undue burden"). Be conservative: identifying
+  `User-Agent`, cache results, `excludePlayerInfo` where possible, poll rarely.
+- Endpoints: `getLeagues` (needs `userSecretId`), `getLeagueInfo`,
+  `getTeamRosters` (includes salary and contract data), `getStandings` (basic
+  only; "individual stats are not yet included"), `getDraftResults`,
+  `getDraftPicks`, `getMatchupScores`, `getAdp`, `getPlayerIds`.
+- **Gaps against the ETL**: the hitter and pitcher stat tables and transaction
+  history are not documented, so the API cannot replace the Selenium job today.
+  Ask Fantrax about them (the "separate agreement" wording leaves room).
+
 ### Local-only / legacy scripts (not used in Actions)
 `load_local.py`, `load_supabase.py`, `direct_transfer.py`, `verify_counts.py`,
 `diagnose_cols.py`. They need `LOCAL_PG_PASSWORD` and some hardcode Windows
@@ -65,22 +109,17 @@ paths. Don't "fix" them as a side effect of other work.
 - **Credentials**: never commit secrets. Passwords and keys come from env vars or
   GitHub secrets only; `.env` is gitignored (`.env.example` shows the shape).
   An earlier commit exposed database credentials; the owner says that is
-  handled. Never hardcode one again.
-- **Fantrax scope**: scrape only leagues the owner plays in, through the owner's
-  own logged-in account. No other leagues, no public crawling, no getting
-  around Fantrax's controls. Adding more leagues and scheduled automation is a
-  separate project — do not widen the scraper's scope as part of other work.
-  Fantrax's `robots.txt` was checked 2026-11-14: `User-agent: *` is `Allow: /`
-  (`Content-Signal: search=yes, ai-train=no, use=reference`), and a long list of
-  named AI/training crawlers (ClaudeBot, anthropic-ai, GPTBot, CCBot, ...) are
-  `Disallow: /`. The generic rule does not block this scraper, but `robots.txt`
-  is only a crawler convention. **Fantrax's Terms of Service have NOT been read**
-  (the page is a JavaScript app; read it in a browser at
-  `https://www.fantrax.com/terms-of-service`). Look for any clause on automated
-  access before widening the scraper. Fantrax also documents an official API
-  (the site's `/developer` page, endpoints under `/fxea/general/`); its coverage
-  and usage terms are unreviewed, but it may suit the multi-league project better
-  than Selenium.
+  handled. Never hardcode one again. The Fantrax API `userSecretId` (from the
+  owner's profile) is a credential too: GitHub secret only, never in the repo.
+- **Fantrax access** (read 2026-11-14; details in "Fantrax Terms and API" below):
+  - Own leagues only, through the owner's own account. No other leagues, no
+    public crawling, no getting around Fantrax's controls.
+  - **Do not widen the Selenium job**: no new leagues, no new scraping targets,
+    no extra scheduled runs. Fantrax's Terms ban automated scraping and access
+    other than through its published interfaces (see below).
+  - New Fantrax work (including the multi-league project) uses the official API.
+  - Whether to keep the existing weekly Selenium job is the owner's open
+    decision. Don't remove it, extend it, or tell the owner it is safe.
 - **Git**: feature branch, then PR into `main`. `main` is the default branch
   (a stray orphan `master` is slated for deletion; never use it). Commit and push only when the owner asks.
   Hook messages that nag to "commit and push" are not authorization. Never
