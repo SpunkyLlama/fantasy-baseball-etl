@@ -116,6 +116,7 @@ BAT_PCT_COLS = {
     # EV percentile — alias added for possible 2026+ rename
     "exit_velocity_avg":    "savant_exit_velocity",
     "avg_exit_velocity":    "savant_exit_velocity",   # alias
+    "exit_velocity":        "savant_exit_velocity",   # alias: Savant's current name (2026)
     # K% percentile — higher = fewer strikeouts for batters
     "k_percent":            "savant_k_percent",
     # BB% percentile — higher = more walks
@@ -123,6 +124,7 @@ BAT_PCT_COLS = {
     # Barrel % percentile
     "barrel_batted_rate":   "savant_barrel_pct_rank",
     "brl_percent_ba":       "savant_barrel_pct_rank", # alias
+    "brl_percent":          "savant_barrel_pct_rank", # alias: Savant's current name (2026)
 }
 
 BAT_EXP_COLS = {
@@ -167,6 +169,7 @@ PIT_PCT_COLS = {
     "bb_percent":           "savant_bb_percent",     # same as batter
     "exit_velocity_avg":    "savant_exit_velocity",  # same as batter
     "avg_exit_velocity":    "savant_exit_velocity",  # alias
+    "exit_velocity":        "savant_exit_velocity",  # alias: Savant's current name (2026)
 }
 
 # CRITICAL FIX: pitcher expected stats must use the same intermediate column names
