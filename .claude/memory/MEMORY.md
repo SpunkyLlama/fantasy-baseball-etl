@@ -12,6 +12,11 @@ Last updated: 2026-11-14
 - Live Savant ETL run 2026-11-14 (run 43640273764, owner-approved): 1,317 rows
   upserted, 0 errors. All sources non-zero; `savant_ev_pct` in the DB runs 1–100
   with quartiles 24/47/73, so it is a percentile, not mph.
+- Non-null counts per column in the Savant extract log (PR #10). Second live run
+  2026-11-14 (run 43646213135, owner-approved): 1,317 rows, 0 errors. Hitters 245
+  of 611 and pitchers 339 of 706 have percentiles/expected stats, the same players
+  for both, so the blanks are Savant's (apparently unqualified players), not a
+  loading bug. Details in `CLAUDE.md`.
 - `savant_metrics` has no `season` column, so omitting it from `COL_MAP` is
   correct (see `CLAUDE.md`, Known mess).
 
@@ -19,10 +24,8 @@ Last updated: 2026-11-14
 - Delete remote branches in the GitHub web UI (git push and the REST API both
   failed from the cloud session): `master` (owner approved), plus the stale
   branches listed in `CLAUDE.md`.
-- Verify what a Savant run actually wrote: add per-column non-null counts to the
-  extract log. On 2026-11-14 the DB had `savant_ev_pct` for 252 of 779 hitters and
-  383 of 1,040 pitchers; likely Savant leaving percentiles blank for unqualified
-  players, but not confirmed (the run's CSV artifact could not be downloaded).
+- Check downstream (Decision Engine, Power BI) treats a null Savant percentile
+  or expected stat as "not qualified", not zero (about 60% of rows are null).
 - Test gaps: Selenium scraper, Supabase load step, standings parser, date helpers.
 - Read Fantrax's Terms of Service (browser; the page is JS-rendered). `robots.txt`
   is done: generic rule allows, named AI crawlers are disallowed (details in

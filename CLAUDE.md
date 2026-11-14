@@ -40,8 +40,20 @@ Secret: `SUPABASE_SERVICE_KEY` (service key, `sb_secret_...`). No anon fallback.
 A manual run **writes to live Supabase** — only run it when the owner says so.
 
 After a Savant run, check: all four sources have non-zero rows, and
-`savant_ev_pct` values spread across roughly 1–99. Values clustered near ~90
-mean mph leaked in where a percentile belongs.
+`savant_ev_pct` values spread across roughly 1–100 (the 2026-11-14 run: min 1,
+quartiles 24/47/73, max 100). Values clustered near ~90 mean mph leaked in where
+a percentile belongs.
+
+The extract log also prints non-null counts per column, split by player type
+(`H` / `P`). **Blank percentiles and expected stats are normal.** In the
+2026-11-14 run only 245 of 611 hitters and 339 of 706 pitchers had them (the
+same players for both), and they appear to be Savant's qualified players (not
+checked against Savant's rules). The other ~60% of rows carry no percentiles or
+expected stats at all, so downstream (Decision Engine, Power BI) a null there
+means "not qualified", not zero: do not average it as 0. Some columns are empty
+by design for a player type, such as `savant_xera` for hitters and sprint speed,
+average EV and `est_slg` for pitchers. Don't treat those as bugs. Compare any
+future run's counts against these numbers before calling something broken.
 
 ### Local-only / legacy scripts (not used in Actions)
 `load_local.py`, `load_supabase.py`, `direct_transfer.py`, `verify_counts.py`,
