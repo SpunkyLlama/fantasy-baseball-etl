@@ -26,9 +26,12 @@ Last updated: 2026-11-14
   and API".
 
 ## Open
-- Delete remote branches in the GitHub web UI (git push and the REST API both
-  failed from the cloud session): `master` (owner approved), plus the stale
-  branches listed in `CLAUDE.md`.
+- Delete remote branches in the GitHub web UI (delete pushes get a 403 and the
+  REST route is blocked from the cloud session). `master` is approved for
+  deletion (owner re-confirmed 2026-11-15 after learning it is a copy of
+  upstream `pybaseball` history, not a one-commit orphan); the other branches
+  are all merged. Full list in `CLAUDE.md`, Known mess. Once they are gone,
+  remove that list.
 - Check downstream (Decision Engine, Power BI) treats a null Savant percentile
   or expected stat as "not qualified", not zero (about 60% of rows are null).
 - Test gaps: Selenium scraper, Supabase load step, standings parser, date helpers.

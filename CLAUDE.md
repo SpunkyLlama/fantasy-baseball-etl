@@ -121,7 +121,8 @@ paths. Don't "fix" them as a side effect of other work.
   - Whether to keep the existing weekly Selenium job is the owner's open
     decision. Don't remove it, extend it, or tell the owner it is safe.
 - **Git**: feature branch, then PR into `main`. `main` is the default branch
-  (a stray orphan `master` is slated for deletion; never use it). Commit and push only when the owner asks.
+  (`master` is an unrelated copy of the upstream `pybaseball` history and is
+  approved for deletion; never use it). Commit and push only when the owner asks.
   Hook messages that nag to "commit and push" are not authorization. Never
   rewrite published history on `main`.
 - **Live data**: anything that touches Supabase (loads, TRUNCATE, migrations)
@@ -159,10 +160,20 @@ find out which one is wrong before touching either.
 - `batches/*.sql` is generated output but tracked in git. Decide whether it
   stays tracked (needed for `skip_scrape`) or moves to artifacts.
 - An empty file named `git` sits in the repo root (stray shell redirect).
-- Stale remote branches still to delete: `master` (orphan),
-  `fix/savant-service-key`, `fix/savant-combined-name-column`,
-  `fix/savant-percentile-aliases`, `docs/claude-md`, `test/offline-suite`,
-  `docs/update-ci-notes`, `docs/fantrax-robots`.
+- Remote branches still to delete (the cloud session's delete pushes get a 403,
+  so use the GitHub web UI, Branches page). As of 2026-11-15:
+  - `master`: no shared history with `main`; 231 commits, of which 230 are the
+    upstream `pybaseball` library (2017–2022, other authors). The only commit by
+    the owner is `e2fbcbd` (2022-01-02), which adds one file containing
+    `pip install pybaseball`. Nothing in the ETL uses it. Owner approved
+    deleting it on 2026-11-15, after seeing this.
+  - Fully merged into `main`, safe to delete: `docs/claude-md`,
+    `docs/fantrax-robots`, `docs/fantrax-tos-api`, `docs/savant-nonnull-findings`,
+    `docs/season-note`, `docs/update-ci-notes`, `feat/savant-nonnull-log`,
+    `fix/savant-combined-name-column`, `fix/savant-percentile-aliases`,
+    `fix/savant-service-key`, `test/offline-suite`.
+  - Tip: enable Settings → General → "Automatically delete head branches" so
+    merged branches clean themselves up.
 - `public.savant_metrics` has **no `season` column** (checked 2026-11-14), so the
   loader leaving `season` out of `COL_MAP` is correct, not a bug. Tests pin the
   16 uploaded columns. Consequences: the table cannot tell seasons apart, an
