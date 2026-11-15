@@ -27,3 +27,15 @@ create table if not exists fantrax_api.draft_results (
 create table if not exists fantrax_api.players (
   player_id text, sport text, name text, team text, position text,
   primary key (sport, player_id));
+
+-- Secure by default: RLS on, no policies. The loader connects as the database owner and bypasses
+-- RLS. Nothing else can read these tables until you add a policy on purpose, e.g. (decide first):
+--   create policy "read all" on fantrax_api.rosters for select to anon using (true);
+-- Note: PostgREST only serves schemas listed under API settings -> Exposed schemas.
+alter table fantrax_api.leagues       enable row level security;
+alter table fantrax_api.teams         enable row level security;
+alter table fantrax_api.rosters       enable row level security;
+alter table fantrax_api.standings     enable row level security;
+alter table fantrax_api.draft_picks   enable row level security;
+alter table fantrax_api.draft_results enable row level security;
+alter table fantrax_api.players       enable row level security;

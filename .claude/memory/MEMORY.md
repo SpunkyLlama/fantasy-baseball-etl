@@ -40,8 +40,14 @@ Last updated: 2026-11-15
 - Basketball league p5pgetzsmqlu7ool added to `leagues.json` (NBA). NFL league (created by someone else)
   NOT added: confirm the owner is a member first (own leagues only).
 - Still missing from the API: hitter/pitcher stat tables, transaction history. Selenium stays for those.
-- Next: owner supplies new league IDs -> add to `leagues.json`; review schema; loader + workflow
-  (dry-run first); front end league switcher.
+- `fantrax_api_load.py` + `.github/workflows/fantrax_api_etl.yml` (uncommitted, on top of PR #15):
+  loader is DRY RUN by default (no DB connection); `--load` replaces one league per transaction
+  (upsert league, delete that league's rows, insert), refuses empty/duplicate/orphaned data, exits 2
+  if the `fantrax_api` schema is missing. Workflow is manual only, `dry_run` defaults to true, no
+  schedule. NOT run live; needs: schema applied, `FANTRAX_USER_AGENT` + `SUPABASE_PASSWORD` secrets,
+  owner go-ahead. Schema draft now enables RLS (no policies) on every new table.
+- Next: review schema; apply it; first live load; front end league switcher; decide a read path
+  (policies / exposed schema / public views) for the Decision Engine and Power BI.
 
 ## Open
 - Delete remote branches in the GitHub web UI (delete pushes get a 403 and the
