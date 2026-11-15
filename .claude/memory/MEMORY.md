@@ -1,6 +1,6 @@
 # MEMORY.md — project state index
 
-Last updated: 2026-11-14
+Last updated: 2026-11-15
 
 ## Shipped
 - Savant ETL runs with the service key (PR #2 merged), combined-name column fix (#3),
@@ -24,6 +24,24 @@ Last updated: 2026-11-14
   API page has no usage terms, only a required `User-Agent`, and does not cover
   the stat tables or transactions. Full findings in `CLAUDE.md`, "Fantrax Terms
   and API".
+
+## In progress (branch `feat/fantrax-api-client`)
+- `fantrax_api.py` + `leagues.json` + `tests/test_fantrax_api.py`: official-API client
+  (identifying User-Agent, 1s delay, cache, retry) and normalizers keyed by `league_id`.
+  Live read-only run against HoD 2026-11-15: 28 teams, 1,594 roster rows (salary +
+  contract included), 28 standings, 420 future picks, 1,540 draft results. `getLeagueInfo`
+  needs no `userSecretId`. Writes JSON only; no Supabase writes yet.
+- `sql/fantrax_api_schema.sql`: DRAFT generic multi-league schema (`fantrax_api.*`), not applied.
+- Reconciled 2026-11-15 (read-only SELECTs, owner-approved): API rosters vs the Selenium-loaded
+  `Fantrax_Players_*` tables, per league + owner, hash of player id:salary:contract. All 28 groups
+  match once two-way players are de-duplicated. The Selenium tables list a two-way player in BOTH the
+  hitter and pitcher tables (7 cases: Ohtani, Tolbert, Sanoja, Cortes, Williamson...), so any sum or
+  count over both tables double-counts them. The API lists each once. Draft rows match (1,540).
+- Basketball league p5pgetzsmqlu7ool added to `leagues.json` (NBA). NFL league (created by someone else)
+  NOT added: confirm the owner is a member first (own leagues only).
+- Still missing from the API: hitter/pitcher stat tables, transaction history. Selenium stays for those.
+- Next: owner supplies new league IDs -> add to `leagues.json`; review schema; loader + workflow
+  (dry-run first); front end league switcher.
 
 ## Open
 - Delete remote branches in the GitHub web UI (delete pushes get a 403 and the

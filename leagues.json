@@ -1,0 +1,19 @@
+{
+  "_note": "Own Fantrax leagues only. league_id is the id in the Fantrax league URL. Add new leagues here; no code change needed.",
+  "leagues": [
+    {
+      "league_id": "cwp6mey5mk1ubete",
+      "key": "hod",
+      "name": "HoD (Topps + Rawlings)",
+      "contracts": true,
+      "sport": "MLB"
+    },
+    {
+      "league_id": "p5pgetzsmqlu7ool",
+      "key": "hoops",
+      "name": "H🏀🏀Ps",
+      "sport": "NBA",
+      "contracts": true
+    }
+  ]
+}
