@@ -47,5 +47,5 @@ Last updated: 2026-11-14
 - Build the multi-league project on the official API (identifying
   `User-Agent`, caching, conservative polling). Store `userSecretId` as a
   GitHub secret.
-- Decide: keep `batches/` tracked? Remove stray `git` file?
+- Decide: keep `batches/` tracked?
 - Decide whether to turn off Pages on this repo.

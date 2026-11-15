@@ -159,7 +159,6 @@ find out which one is wrong before touching either.
 
 - `batches/*.sql` is generated output but tracked in git. Decide whether it
   stays tracked (needed for `skip_scrape`) or moves to artifacts.
-- An empty file named `git` sits in the repo root (stray shell redirect).
 - Remote branches still to delete (the cloud session's delete pushes get a 403,
   so use the GitHub web UI, Branches page). As of 2026-11-15:
   - `master`: no shared history with `main`; 231 commits, of which 230 are the
