@@ -1,6 +1,9 @@
 # Credentials — never commit
 .env
 
+# Downloaded Fantrax CSVs (default FANTRAX_SOURCES_DIR)
+csv_downloads/
+
 # Selenium debug dumps
 debug_*.html
 
