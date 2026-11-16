@@ -1,8 +1,19 @@
--- DRAFT. NOT APPLIED. Review, then run in the Supabase SQL editor (project rlwidfirrdwolaywjpca).
+-- APPLIED 2026-11-16 to Supabase project rlwidfirrdwolaywjpca, with the owner's go-ahead, as the
+-- migration `enable_rls_fantrax_18_tables` (steps 1 and 2 below). Kept here as the record.
 -- Drafted 2026-11-15 from read-only inspection of the live database.
 --
+-- HOW IT WAS APPLIED: steps 1 and 2 were run through the migration tool, NOT inside the
+-- begin/commit wrapper below, and the step 3 verification was run separately. Verified after applying:
+--   * all 18 tables: RLS on (0 off); `anon` has no SELECT and no write privilege on any of them
+--   * as `anon`: a direct read of fantrax.savant_metrics fails with "permission denied" (intended)
+--   * as `anon`: the public views (v_league_rosters, v_hitter_stats, v_pitcher_stats,
+--     v_league_financials, v_team_gap_priority, v_contract_decision_summary, v_cap_health,
+--     v_player_projections, v_pick_valuations) and public.contract_decisions / public.teams still return rows
+-- NOT checked: index.html in a browser, a Power BI refresh, or the next etl.yml / Savant run.
+-- To undo, use the ROLLBACK block at the bottom of this file.
+--
 -- WHAT THE ADVISORY FLAGGED: 18 tables in schema `fantrax` have Row Level Security off.
--- WHAT IS ACTUALLY EXPOSED TODAY (checked with has_table_privilege):
+-- WHAT WAS ACTUALLY EXPOSED BEFORE THIS FIX (checked with has_table_privilege):
 --   * 10 tables: `anon` has NO privileges at all -> already unreachable through the API.
 --       Fantrax_HOD_Drafts, Fantrax_Players_{Hitters,Pitchers}_{Topps,Rawlings},
 --       Fantrax_Standings, Fantrax_Standings_Hit, Fantrax_Standings_Pit,
@@ -74,7 +85,7 @@ where n.nspname = 'fantrax' and c.relkind = 'r'
 select count(*) as v_league_rosters_rows from public.v_league_rosters;
 select count(*) as v_hitter_stats_rows   from public.v_hitter_stats;
 
--- Review the output above, then run exactly one of:
+-- (Not used: already applied, see the header.) Originally: review the output above, then run one of:
 --   commit;
 --   rollback;
 
