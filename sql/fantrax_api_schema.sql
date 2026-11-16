@@ -1,7 +1,15 @@
--- DRAFT. Not applied. Generic multi-league tables for the Fantrax API pipeline.
+-- APPLIED 2026-11-16 to Supabase project rlwidfirrdwolaywjpca, with the owner's go-ahead, as the
+-- migration `create_fantrax_api_schema`. Kept here as the record; the statements are idempotent.
+-- Generic multi-league tables for the Fantrax API pipeline.
 -- Every table is keyed by league_id so any league (any scoring format, with or
 -- without contracts) fits. contract/salary are NULL for leagues without them.
--- Review before applying; applying touches live Supabase and needs owner go-ahead.
+--
+-- Verified after applying: 7 tables, RLS on for all, `anon` and `authenticated` have no table
+-- privileges and no schema usage, columns and primary keys match fantrax_api_load.py, all tables
+-- empty (0 rows). NOT yet checked: the loader against these tables (only tested with a fake
+-- cursor), because nothing has been loaded. The first live load is that test.
+-- No read policies exist yet: the Decision Engine and Power BI cannot read these tables until the
+-- read path is decided (policies, exposed schema, or views in `public`).
 create schema if not exists fantrax_api;
 
 create table if not exists fantrax_api.leagues (
