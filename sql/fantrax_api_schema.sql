@@ -1,7 +1,15 @@
--- DRAFT. Not applied. Generic multi-league tables for the Fantrax API pipeline.
+-- APPLIED 2026-11-16 to Supabase project rlwidfirrdwolaywjpca, with the owner's go-ahead, as the
+-- migration `create_fantrax_api_schema`. Kept here as the record; the statements are idempotent.
+-- Generic multi-league tables for the Fantrax API pipeline.
 -- Every table is keyed by league_id so any league (any scoring format, with or
 -- without contracts) fits. contract/salary are NULL for leagues without them.
--- Review before applying; applying touches live Supabase and needs owner go-ahead.
+--
+-- Verified after applying: 7 tables, RLS on for all, `anon` and `authenticated` have no table
+-- privileges and no schema usage, columns and primary keys match fantrax_api_load.py, all tables
+-- empty (0 rows). NOT yet checked: the loader against these tables (only tested with a fake
+-- cursor), because nothing has been loaded. The first live load is that test.
+-- No read policies exist yet: the Decision Engine and Power BI cannot read these tables until the
+-- read path is decided (policies, exposed schema, or views in `public`).
 create schema if not exists fantrax_api;
 
 create table if not exists fantrax_api.leagues (
@@ -27,3 +35,15 @@ create table if not exists fantrax_api.draft_results (
 create table if not exists fantrax_api.players (
   player_id text, sport text, name text, team text, position text,
   primary key (sport, player_id));
+
+-- Secure by default: RLS on, no policies. The loader connects as the database owner and bypasses
+-- RLS. Nothing else can read these tables until you add a policy on purpose, e.g. (decide first):
+--   create policy "read all" on fantrax_api.rosters for select to anon using (true);
+-- Note: PostgREST only serves schemas listed under API settings -> Exposed schemas.
+alter table fantrax_api.leagues       enable row level security;
+alter table fantrax_api.teams         enable row level security;
+alter table fantrax_api.rosters       enable row level security;
+alter table fantrax_api.standings     enable row level security;
+alter table fantrax_api.draft_picks   enable row level security;
+alter table fantrax_api.draft_results enable row level security;
+alter table fantrax_api.players       enable row level security;

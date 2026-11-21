@@ -1,0 +1,96 @@
+name: Fantrax API ETL - multi-league (manual, dry run by default)
+
+# Pulls every league in leagues.json through Fantrax's official REST API and loads the
+# fantrax_api.* tables in Supabase. MANUAL ONLY: there is deliberately no schedule until the
+# owner approves one. dry_run defaults to 'true' (fetch + validate + counts, no database
+# connection). A live run (dry_run = false) writes to Supabase: run it only when the owner says so,
+# and only after sql/fantrax_api_schema.sql has been applied.
+#
+# This does not replace fantrax_scraper.py / etl.yml. The API has no per-player stat tables or
+# transaction history, so the Selenium job still owns those.
+#
+# Secrets: FANTRAX_USER_AGENT (identifies this program to Fantrax; required on every request),
+#          SUPABASE_PASSWORD (live runs only).
+
+"on":
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true = fetch and validate only, no database connection"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      league:
+        description: "Only this league_id (blank = every league in leagues.json)"
+        required: false
+        default: ""
+        type: string
+      players:
+        description: "Also load the player id map per sport (~1 MB per sport)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fantrax-api-etl
+  cancel-in-progress: false
+
+jobs:
+  etl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt requests
+
+      - name: Fetch, validate and (if not a dry run) load
+        shell: bash   # bash -eo pipefail: a failing python must fail the job despite `| tee`
+        env:
+          FANTRAX_USER_AGENT: ${{ secrets.FANTRAX_USER_AGENT }}
+          SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          LEAGUE: ${{ inputs.league }}
+          PLAYERS: ${{ inputs.players }}
+        run: |
+          if [ -z "$FANTRAX_USER_AGENT" ]; then
+            echo "::error::Secret FANTRAX_USER_AGENT is not set"; exit 1
+          fi
+          args=(--out api_out)
+          [ -n "$LEAGUE" ] && args+=(--league "$LEAGUE")
+          [ "$PLAYERS" = "true" ] && args+=(--players)
+          if [ "$DRY_RUN" = "false" ]; then
+            if [ -z "$SUPABASE_PASSWORD" ]; then
+              echo "::error::Secret SUPABASE_PASSWORD is not set"; exit 1
+            fi
+            args+=(--load)
+          fi
+          echo "dry_run=$DRY_RUN args=${args[*]}"
+          python fantrax_api_load.py "${args[@]}" 2>&1 | tee api_etl_log.txt
+
+      - name: Upload fetched JSON and log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fantrax-api-${{ github.run_id }}
+          path: |
+            api_out/
+            api_etl_log.txt
+          if-no-files-found: ignore
+          retention-days: 14
