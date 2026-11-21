@@ -3,7 +3,7 @@ load_local.py
 Loads all Fantrax batch SQL files into LOCAL PostgreSQL (pgAdmin 4 / fantrax DB).
 
 Run from Anaconda Prompt:
-  python "C:/Users/James/OneDrive/Documents/Claude/Projects/Fantasy Baseball (1)/load_local.py"
+  python load_local.py        (set FANTRAX_BATCHES_DIR if the batches are not in ./batches)
 
 What it does:
   1. TRUNCATEs the 4 player tables + HOD_Drafts in local Postgres
@@ -27,7 +27,7 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 # ── Config ────────────────────────────────────────────────────────────────────
-BATCH_DIR = r"C:\Users\James\OneDrive\Documents\Claude\Projects\Fantasy Baseball (1)\batches"
+BATCH_DIR = os.environ.get("FANTRAX_BATCHES_DIR", "batches")
 
 # Tables to TRUNCATE then reload (Transaction History already managed separately)
 RELOAD_TABLES = [

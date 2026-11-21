@@ -3,7 +3,7 @@ csv_to_batches.py
 Converts Fantrax CSV exports into batch SQL INSERT files consumed by
 load_supabase_actions.py.
 
-Reads CSVs from FANTRAX_SOURCES_DIR (or local Sources folder).
+Reads CSVs from FANTRAX_SOURCES_DIR (default: ./csv_downloads).
 Writes batch SQL files to ./batches/ (500 rows per file).
 
 The two HOD Drafts CSVs (Topps + Rawlings) are merged into one table.
@@ -21,12 +21,9 @@ from datetime import datetime
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 
-SOURCES_DIR = Path(
-    os.environ.get(
-        "FANTRAX_SOURCES_DIR",
-        r"C:\Users\James\OneDrive\Documents\Claude-Working-Folder\Fantrax\Sources",
-    )
-)
+# Set FANTRAX_SOURCES_DIR to put the CSVs somewhere else (GitHub Actions does).
+# The default is a folder next to where the script is run, never a user path.
+SOURCES_DIR = Path(os.environ.get("FANTRAX_SOURCES_DIR", "csv_downloads"))
 BATCHES_DIR = Path(os.environ.get("FANTRAX_BATCHES_DIR", "batches"))
 SCHEMA      = "fantrax"
 ROWS_PER_FILE = 500

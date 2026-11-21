@@ -1,7 +1,7 @@
 """
 load_supabase.py
 Loads all Fantrax batch SQL files into Supabase.
-Run from Spyder: %runfile C:/Users/James/load_supabase.py --wdir
+Run from Spyder: %runfile load_supabase.py --wdir <this folder>
 Required GitHub Secret:
     SUPABASE_PASSWORD   — Supabase database password
 
@@ -25,7 +25,7 @@ engine = create_engine(
 )
 
 # ── Batch file directory ─────────────────────────────────────────────────────
-BATCH_DIR = r"C:\Users\James\OneDrive\Documents\Claude\Projects\Fantasy Baseball (1)\batches"
+BATCH_DIR = os.environ.get("FANTRAX_BATCHES_DIR", "batches")
 
 # Already loaded — skip these
 SKIP = {"Fantrax_Transaction_History_000.sql"}

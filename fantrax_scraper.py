@@ -42,14 +42,11 @@ FANTRAX_EMAIL    = os.environ.get("FANTRAX_EMAIL", "")
 FANTRAX_PASSWORD = os.environ.get("FANTRAX_PASSWORD", "")
 
 # FANTRAX_HEADLESS=true  → headless Chrome (used in GitHub Actions)
-# FANTRAX_SOURCES_DIR    → override download destination (used in GitHub Actions)
+# FANTRAX_SOURCES_DIR    → download destination (default ./csv_downloads; GitHub Actions sets it)
 HEADLESS    = os.environ.get("FANTRAX_HEADLESS", "false").lower() == "true"
-SOURCES_DIR = Path(
-    os.environ.get(
-        "FANTRAX_SOURCES_DIR",
-        r"C:\Users\James\OneDrive\Documents\Claude-Working-Folder\Fantrax\Sources",
-    )
-)
+# Set FANTRAX_SOURCES_DIR to put the CSVs somewhere else (GitHub Actions does).
+# The default is a folder next to where the script is run, never a user path.
+SOURCES_DIR = Path(os.environ.get("FANTRAX_SOURCES_DIR", "csv_downloads"))
 
 LOGIN_URL      = "https://www.fantrax.com/login"
 LEAGUE_ID      = "cwp6mey5mk1ubete"
