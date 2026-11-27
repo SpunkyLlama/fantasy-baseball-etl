@@ -91,7 +91,7 @@ def test_norm_players_tags_sport():
 def test_leagues_config_valid():
     import json
     from pathlib import Path
-    lg = json.loads((Path(fa.__file__).parent / "leagues.json").read_text())["leagues"]
+    lg = json.loads((Path(fa.__file__).parent / "leagues.json").read_text(encoding="utf-8"))["leagues"]
     ids = [l["league_id"] for l in lg]
     assert len(ids) == len(set(ids)) and all(l["sport"] for l in lg)
 
