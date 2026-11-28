@@ -8,6 +8,10 @@ name: Fantrax ETL - Weekly Supabase Load
 #   2. Convert — csv_to_batches.py turns CSVs into batch SQL INSERT files
 #   3. Load    — load_supabase_actions.py TRUNCATEs and reloads Supabase
 
+# The job only checks out the code and uploads logs; nothing here writes to the repo.
+permissions:
+  contents: read
+
 "on":
   schedule:
     - cron: '0 11 * * 1'
